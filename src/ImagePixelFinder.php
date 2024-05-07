@@ -33,10 +33,29 @@ class ImagePixelFinder {
         return $hex;
     }
 
+    private function getImageType($imagePath): int
+    {
+        $imageInfo = getimagesize($imagePath);
+        return $imageInfo[2];
+    }
+
+    private function loadImage($imagePath, $imageType)
+    {
+        return match ($imageType) {
+            IMAGETYPE_PNG => imagecreatefrompng($imagePath),
+            IMAGETYPE_JPEG => imagecreatefromjpeg($imagePath),
+            IMAGETYPE_GIF => imagecreatefromgif($imagePath),
+            default => null,
+        };
+    }
+
     public function findPixelColor($imagePath, $x, $y): string
     {
-        // Load the image
-        $image = imagecreatefrompng($imagePath);
+        // Determine the image type
+        $imageType = $this->getImageType($imagePath);
+
+        // Load the image based on the type
+        $image = $this->loadImage($imagePath, $imageType);
 
         // Get the color of the pixel at the specified x and y coordinates
         $rgb = imagecolorat($image, $x, $y);
@@ -57,18 +76,21 @@ class ImagePixelFinder {
 
     public function findWeightColor($imagePath): array
     {
-        // Resmi yükle
-        $image = imagecreatefromjpeg($imagePath);
+        // Determine the image type
+        $imageType = $this->getImageType($imagePath);
 
-        // Resmin genişliği ve yüksekliği
+        // Load the image based on the type
+        $image = $this->loadImage($imagePath, $imageType);
+
+        // Width and height of the image
         $width = imagesx($image);
         $height = imagesy($image);
 
-        // Kenarlardaki piksel sayısı (örneğin %5)
+        // Number of pixels on the edges (e.g. 5%)
         $marginPercentage = 5;
         $marginPixels = min($width, $height) * $marginPercentage / 100;
 
-        // Üst kenar
+        // Top edge
         $topColors = [];
         for ($x = 0; $x < $width; $x++) {
             for ($y = 0; $y < $marginPixels; $y++) {
@@ -78,7 +100,7 @@ class ImagePixelFinder {
             }
         }
 
-        // Alt kenar
+        // Bottom edge
         $bottomColors = [];
         for ($x = 0; $x < $width; $x++) {
             for ($y = $height - $marginPixels; $y < $height; $y++) {
@@ -88,7 +110,7 @@ class ImagePixelFinder {
             }
         }
 
-        // Sol kenar
+        // Left edge
         $leftColors = [];
         for ($x = 0; $x < $marginPixels; $x++) {
             for ($y = 0; $y < $height; $y++) {
@@ -98,7 +120,7 @@ class ImagePixelFinder {
             }
         }
 
-        // Sağ kenar
+        // Right edge
         $rightColors = [];
         for ($x = $width - $marginPixels; $x < $width; $x++) {
             for ($y = 0; $y < $height; $y++) {
@@ -108,19 +130,19 @@ class ImagePixelFinder {
             }
         }
 
-        // Renk tonu ağırlıklarını hesapla
+        // Calculate hue weights
         $topWeight = $this->calculateColorWeight($topColors);
         $bottomWeight = $this->calculateColorWeight($bottomColors);
         $leftWeight = $this->calculateColorWeight($leftColors);
         $rightWeight = $this->calculateColorWeight($rightColors);
 
-        // Renk tonlarını hex kodlarına dönüştür
+        // Convert color tones to hex codes
         $topColorHex = $this->rgbToHex($topWeight);
         $bottomColorHex = $this->rgbToHex($bottomWeight);
         $leftColorHex = $this->rgbToHex($leftWeight);
         $rightColorHex = $this->rgbToHex($rightWeight);
 
-        // Sonuçları döndür
+        //Return results
         return [
             'top' => $topColorHex,
             'bottom' => $bottomColorHex,
@@ -131,17 +153,20 @@ class ImagePixelFinder {
 
     public function findMostUsedColor($imagePath): string
     {
-        // Resmi yükle
-        $image = imagecreatefromjpeg($imagePath);
+        // Determine the image type
+        $imageType = $this->getImageType($imagePath);
 
-        // Resmin genişliği ve yüksekliği
+        // Load the image based on the type
+        $image = $this->loadImage($imagePath, $imageType);
+
+        // Width and height of the image
         $width = imagesx($image);
         $height = imagesy($image);
 
-        // Renklerin sayımı için bir dizi oluştur
+        // Create an array for counting colors
         $colorCounts = [];
 
-        // Resim üzerinde dolaşarak renkleri say
+        // Count the colors by moving around the image
         for ($x = 0; $x < $width; $x++) {
             for ($y = 0; $y < $height; $y++) {
                 $colorIndex = imagecolorat($image, $x, $y);
@@ -154,13 +179,14 @@ class ImagePixelFinder {
             }
         }
 
-        // En çok kullanılan rengi bul
+        // Find the most used color
         arsort($colorCounts);
         $mostUsedColor = key($colorCounts);
 
-        // Renk tonunu hexadecimal olarak dönüştür
+        // Convert hue to hexadecimal
         $mostUsedColorRGB = explode(',', $mostUsedColor);
-        // Sonucu döndür
+
+        // Return the result
         return $this->rgbToHex3Code($mostUsedColorRGB[0], $mostUsedColorRGB[1], $mostUsedColorRGB[2]);
     }
 }
