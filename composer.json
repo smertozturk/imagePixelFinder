@@ -1,35 +1,36 @@
 {
-    "name": "smertozturk/image_pixel_finder",
-    "description": "A tool that gives the color weight at the edges of the image, the most used color tone in the given image, or the color tone in any pixel.",
-    "type": "library",
-    "license": "MIT",
-    "authors": [
-        {
-            "role": "Developer",
-            "name": "Mert Öztürk",
-            "email": "sametmertozturk1@gmail.com"
-        }
-    ],
-    "autoload": {
-        "psr-4": {
-            "smertozturk\\imagepixelfinder\\": "src/"
-        }
-    },
-    "autoload-dev": {
-        "psr-4": {
-            "smertozturk\\imagepixelfinder\\Tests\\": "tests/"
-        }
-    },
-    "require": {
-        "php": "^8.1",
-        "illuminate/support": "^11.6",
-      "ext-gd": "*"
-    },
-    "minimum-stability": "dev",
-    "prefer-stable": true,
-    "config": {
-        "sort-packages": true,
-        "preferred-install": "dist",
-        "optimize-autoloader": true
+  "name": "smertozturk/image_pixel_finder",
+  "description": "A tool that gives the color weight at the edges of the image, the most used color tone in the given image, or the color tone in any pixel.",
+  "type": "library",
+  "license": "MIT",
+  "version": "1.0.0",
+  "authors": [
+    {
+      "role": "Developer",
+      "name": "Mert Öztürk",
+      "email": "sametmertozturk1@gmail.com"
     }
+  ],
+  "autoload": {
+    "psr-4": {
+      "smertozturk\\imagepixelfinder\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "smertozturk\\imagepixelfinder\\Tests\\": "tests/"
+    }
+  },
+  "require": {
+    "php": "^8.1",
+    "illuminate/support": "^11.6",
+    "ext-gd": "*"
+  },
+  "minimum-stability": "stable",
+  "prefer-stable": true,
+  "config": {
+    "sort-packages": true,
+    "preferred-install": "dist",
+    "optimize-autoloader": true
+  }
 }
